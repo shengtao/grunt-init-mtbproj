@@ -1,6 +1,6 @@
 'use strict';
 
-function runTask(grunt) {
+module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		name: '{%= name %}',
@@ -8,8 +8,10 @@ function runTask(grunt) {
 		assetsPath: 'assets',
 		distPath: '{%= publish_dir %}',
 
+		clean: ['<%= distPath%>/*'],
+
 		copy: {
-			package: {
+			main: {
 				files: [{
 					expand: true,
 					cwd: './',
@@ -25,7 +27,7 @@ function runTask(grunt) {
 			},
 		
 			main: {
-				src: ['<%= srcPath %>/<%= name %>.js'],
+				src: ['<%= srcPath %>/main.js'],
 				dest: '<%= distPath %>/<%= name %>.debug.js'
 			}
 		},
@@ -75,37 +77,45 @@ function runTask(grunt) {
 		},
 
 		watch: {
-			package: {
+			combo: {
 				files: ['package.json'],
-				tasks: ['copy:package', 'depcombo:main']
+				tasks: ['copy', 'depcombo:debug']
 			},
 
 
 			js: {
 				files: ['<%= srcPath %>/*.js', '<%= srcPath %>/**/*.js'],
-				tasks: ['depconcat:main', 'uglify:main']
+				tasks: ['depconcat', 'uglify', 'depcombo:debug']
 			},
 
 			css:  {
 				files: ['<%= assetsPath %>/*.less', '<%= assetsPath %>/**/*.less'],
-				tasks: ['less:main', 'cssmin:main']
+				tasks: ['less', 'cssmin']
 			}
 		},
 
 		depcombo: {
-			main: {
-				options: {
-					useDebug: true,
-					useDaily: false,
-					output: 'url'
-				},
-				dest: '<%= distPath%>/combo.js'
-			}
+            debug: {
+                options: {
+                  useDebug: true,
+                  useDaily: false,
+                  output: 'url'
+                },
+                dest: '<%= distPath%>/combo.debug.js'
+            },
+
+            main: {
+                options: {
+                    output: 'file'
+                },
+                dest: '<%= distPath%>/combo.js'
+            }
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-depconcat');
 	grunt.loadNpmTasks('grunt-depcombo');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-less');
@@ -117,9 +127,4 @@ function runTask(grunt) {
 	grunt.registerTask('dev', ['watch']);
 	
 	grunt.registerTask('default', ['dist']);
-
-};
-
-module.exports = function(grunt) {
-	runTask(grunt);
 }
