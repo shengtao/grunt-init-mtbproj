@@ -8,10 +8,10 @@
 'use strict';
 
 // Basic template description.
-exports.description = '创建一个基于mtb组的gitlab项目';
+exports.description = '无线VE前端初始化项目';
 
 // Template-specific notes to be displayed before question prompts.
-exports.notes = '_项目名称_ 不能包含“gitlab”、“mtb”、“app”、“lib”或者“js”等字样';
+exports.notes = '_项目类型_ ctrl 是控件, lib 是组件, app 是业务需求';
 
 // Template-specific notes to be displayed after question prompts.
 exports.after = '用 _npm install_ 安装依赖模块，此后，可以通过 _grunt_ 来运行任务。' + 
@@ -38,16 +38,16 @@ exports.template = function(grunt, init, done) {
 
   init.process({type: 'mtbproj'}, [
     // Prompt for these values.
-    init.prompt(PROMPT_WORDS.type, 'lib'),
+    init.prompt(PROMPT_WORDS.type, 'app'),
     init.prompt(PROMPT_WORDS.name, 'helloworld'),
-    init.prompt(PROMPT_WORDS.description, 'a lib project'),
+    init.prompt(PROMPT_WORDS.description, 'an app project'),
     init.prompt(PROMPT_WORDS.version, '0.1.0'),
     init.prompt(PROMPT_WORDS.repository),
     init.prompt(PROMPT_WORDS.homepage),
     init.prompt(PROMPT_WORDS.licenses, 'MIT'),
     init.prompt(PROMPT_WORDS.author_name),
     init.prompt(PROMPT_WORDS.author_email),
-    init.prompt(PROMPT_WORDS.publish_dir, 'build')
+    //init.prompt(PROMPT_WORDS.publish_dir, 'build')
   ], function(err, props) {
     // A few additional properties.
     for (var k in PROMPT_WORDS) {

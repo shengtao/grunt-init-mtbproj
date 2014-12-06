@@ -12,6 +12,27 @@
 
 运行 `grunt`，来对项目进行打包。关于Grunt的知识，请参见[gruntjs](http://gruntjs.com/);
 
+## 请忽略.svnignore 中的目录和文件
+
+忽略方法（命令行）
+
+    $ svn propedit svn:ignore .
+
+输入需要忽略的文件名或者目录名
+
 ## 如何使用
+
+### 开发及时调试
+
+    grunt dev
+
+### 从头打包部署
+
+    grunt
+
+### 提交发布
+
+    grunt publish
+
 
 未完待续

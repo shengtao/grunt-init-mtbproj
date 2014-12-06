@@ -4,22 +4,13 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		name: '{%= name %}',
-		srcPath: 'src',
+        srcPath: 'js',
 		assetsPath: 'assets',
-		distPath: '{%= publish_dir %}',
+		distPath: 'build',
+        rootPath: '../../../',
+        publishPath: '../../../assets/',
 
 		clean: ['<%= distPath%>/*'],
-
-		copy: {
-			main: {
-				files: [{
-					expand: true,
-					cwd: './',
-					src: ['package.json'],
-					dest: '<%= distPath %>'
-				}]
-			}
-		},
 
 		depconcat: {
 			options: {
@@ -27,7 +18,7 @@ module.exports = function(grunt) {
 			},
 		
 			main: {
-				src: ['<%= srcPath %>/main.js'],
+				src: ['<%= srcPath %>/<%= name %>.js'],
 				dest: '<%= distPath %>/<%= name %>.debug.js'
 			}
 		},
@@ -53,7 +44,7 @@ module.exports = function(grunt) {
 				files: [{
 					expand: true,
 					cwd: '<%= assetsPath %>',
-					src: ['<%= name %>.less'],
+                    src: ['*.less', '!common.less', '!_*.less'],
 					dest: '<%= distPath %>',
 					ext: '.debug.css'
 				}]
@@ -77,15 +68,9 @@ module.exports = function(grunt) {
 		},
 
 		watch: {
-			combo: {
-				files: ['package.json'],
-				tasks: ['copy', 'depcombo:debug']
-			},
-
-
 			js: {
 				files: ['<%= srcPath %>/*.js', '<%= srcPath %>/**/*.js'],
-				tasks: ['depconcat', 'uglify', 'depcombo:debug']
+				tasks: ['depconcat', 'uglify']
 			},
 
 			css:  {
@@ -94,27 +79,39 @@ module.exports = function(grunt) {
 			}
 		},
 
-		depcombo: {
-            debug: {
-                options: {
-                  useDebug: true,
-                  useDaily: false,
-                  output: 'url'
-                },
-                dest: '<%= distPath%>/combo.debug.js'
+        copy: {
+            img: {
+                expand: true,
+                cwd: '<%= assetsPath %>',
+                src: 'img/*',
+                dest: '<%= distPath %>/'
             },
-
-            main: {
+            assets: {
+                expand: true,
+                cwd: '<%= distPath %>/',
+                src: '**',
+                dest: '<%= publishPath + name %>/'
+            },
+            data:{
+                src: 'data/*',
+                dest: '<%= rootPath + name %>/'
+            },
+            html: {
+                expand: true,
+                cwd: './',
+                src: '*.html',
+                dest: '<%= rootPath + name %>/',
                 options: {
-                    output: 'file'
-                },
-                dest: '<%= distPath%>/combo.js'
+                    process: function (content, srcpath) {
+                        return content.replace(/build\//g, '../assets/{%= name %}/').replace(/debug\./g, '');
+                    },
+                }
             }
-		}
+        },
 	});
 
 	grunt.loadNpmTasks('grunt-depconcat');
-	grunt.loadNpmTasks('grunt-depcombo');
+//	grunt.loadNpmTasks('grunt-depcombo');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -123,8 +120,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	
 
-	grunt.registerTask('dist', ['copy', 'depconcat', 'uglify', 'less', 'cssmin', 'depcombo']);
+	grunt.registerTask('dist', ['copy:img', 'depconcat', 'uglify', 'less', 'cssmin']);
 	grunt.registerTask('dev', ['watch']);
 	
 	grunt.registerTask('default', ['dist']);
+    grunt.registerTask('publish', ['copy:assets', 'copy:data', 'copy:html']);
 }
